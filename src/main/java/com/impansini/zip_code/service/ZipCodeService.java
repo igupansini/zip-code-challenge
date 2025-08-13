@@ -17,36 +17,39 @@ import java.util.Optional;
 @Service
 public class ZipCodeService {
     private final Logger log = LoggerFactory.getLogger(ZipCodeService.class);
-
     private final ZipCodeRepository zipCodeRepository;
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
-    public ZipCodeService(ZipCodeRepository zipCodeRepository) {
+    public ZipCodeService(ZipCodeRepository zipCodeRepository, RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.zipCodeRepository = zipCodeRepository;
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional
     public ZipCode save(ZipCode zipCode) {
         log.debug("Request to save a zipCode: {}", zipCode);
 
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://wiremock:8080/api/zipcode-wiremock/" + zipCode.getZipCode();
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        log.info("API WireMock response: {}", response.getBody());
+        ZipCode zipCodeFromApi = fetchZipCodeFromApi(zipCode.getZipCode());
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        if (zipCode.getCreatedAt() == null) {
+            zipCode.setCreatedAt(LocalDateTime.now());
+        }
+        zipCode.setStreet(zipCodeFromApi.getStreet());
+        zipCode.setCity(zipCodeFromApi.getCity());
+        zipCode.setState(zipCodeFromApi.getState());
+        zipCode.setCountry(zipCodeFromApi.getCountry());
 
+        return zipCodeRepository.save(zipCode);
+    }
+
+    private ZipCode fetchZipCodeFromApi(String zipCodeValue) {
+        String url = "http://wiremock:8080/api/zipcode-wiremock/" + zipCodeValue;
         try {
-            ZipCode zipCodeFromApi = objectMapper.readValue(response.getBody(), ZipCode.class);
-
-            if (zipCode.getCreatedAt() == null) {
-                zipCode.setCreatedAt(LocalDateTime.now());
-            }
-            zipCode.setStreet(zipCodeFromApi.getStreet());
-            zipCode.setCity(zipCodeFromApi.getCity());
-            zipCode.setState(zipCodeFromApi.getState());
-            zipCode.setCountry(zipCodeFromApi.getCountry());
-
-            return zipCodeRepository.save(zipCode);
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            log.info("API WireMock response: {}", response.getBody());
+            return objectMapper.readValue(response.getBody(), ZipCode.class);
         } catch (Exception e) {
             log.error("Error processing API response: {}", e.getMessage());
             throw new RuntimeException("Failed to process API response", e);
