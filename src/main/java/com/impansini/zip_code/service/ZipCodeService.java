@@ -1,5 +1,6 @@
 package com.impansini.zip_code.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.impansini.zip_code.domain.ZipCode;
 import com.impansini.zip_code.repository.ZipCodeRepository;
 import jakarta.transaction.Transactional;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +33,24 @@ public class ZipCodeService {
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
         log.info("API WireMock response: {}", response.getBody());
 
-        return zipCodeRepository.save(zipCode);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            ZipCode zipCodeFromApi = objectMapper.readValue(response.getBody(), ZipCode.class);
+
+            if (zipCode.getCreatedAt() == null) {
+                zipCode.setCreatedAt(LocalDateTime.now());
+            }
+            zipCode.setStreet(zipCodeFromApi.getStreet());
+            zipCode.setCity(zipCodeFromApi.getCity());
+            zipCode.setState(zipCodeFromApi.getState());
+            zipCode.setCountry(zipCodeFromApi.getCountry());
+
+            return zipCodeRepository.save(zipCode);
+        } catch (Exception e) {
+            log.error("Error processing API response: {}", e.getMessage());
+            throw new RuntimeException("Failed to process API response", e);
+        }
     }
 
     public List<ZipCode> findAll() {

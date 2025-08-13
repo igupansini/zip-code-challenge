@@ -3,7 +3,6 @@ package com.impansini.zip_code.rest;
 import com.impansini.zip_code.domain.ZipCode;
 import com.impansini.zip_code.repository.ZipCodeRepository;
 import com.impansini.zip_code.service.ZipCodeService;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -32,7 +31,7 @@ public class ZipCodeResource {
     }
 
     @PostMapping("/zip-codes")
-    public ResponseEntity<ZipCode> createZipCode(@Valid @RequestBody ZipCode zipCode) throws URISyntaxException {
+    public ResponseEntity<ZipCode> createZipCode(@RequestBody ZipCode zipCode) throws URISyntaxException {
         log.debug("REST request to save a zipCode: {}", zipCode);
         if (zipCode.getId() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A new zipCode cannot already have an ID");
@@ -44,7 +43,7 @@ public class ZipCodeResource {
     }
 
     @PutMapping("/zip-codes")
-    public ResponseEntity<ZipCode> updateZipCode(@Valid @RequestBody ZipCode zipCode) {
+    public ResponseEntity<ZipCode> updateZipCode(@RequestBody ZipCode zipCode) {
         log.debug("REST request to update a zipCode: {}", zipCode);
         if (zipCode.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id");

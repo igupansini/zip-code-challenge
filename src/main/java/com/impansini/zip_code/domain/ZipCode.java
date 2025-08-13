@@ -17,7 +17,7 @@ public class ZipCode implements Serializable {
 
     @NotNull
     @Column(nullable = false)
-    private LocalDateTime requestTime = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @NotNull
     @Column(nullable = false, length = 10)
@@ -31,9 +31,6 @@ public class ZipCode implements Serializable {
 
     private String country;
 
-    @Lob // Large Object
-    private String apiResponse;
-
     public ZipCode() {
     }
 
@@ -45,12 +42,12 @@ public class ZipCode implements Serializable {
         this.id = id;
     }
 
-    public LocalDateTime getRequestTime() {
-        return requestTime;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setRequestTime(LocalDateTime requestTime) {
-        this.requestTime = requestTime;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getZipCode() {
@@ -93,14 +90,6 @@ public class ZipCode implements Serializable {
         this.country = country;
     }
 
-    public String getApiResponse() {
-        return apiResponse;
-    }
-
-    public void setApiResponse(String apiResponse) {
-        this.apiResponse = apiResponse;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -117,13 +106,12 @@ public class ZipCode implements Serializable {
     public String toString() {
         return "ZipCode{" +
                 "id=" + id +
-                ", requestTime=" + requestTime +
+                ", createdAt=" + createdAt +
                 ", zipCode='" + zipCode + '\'' +
                 ", street='" + street + '\'' +
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", country='" + country + '\'' +
-                ", apiResponse='" + apiResponse + '\'' +
                 '}';
     }
 }
