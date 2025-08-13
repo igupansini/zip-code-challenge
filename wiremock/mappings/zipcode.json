@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/zipcode-wiremock/([0-9]{8})"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "zipCode": "{{request.path.[2]}}",
+      "street": "Sample Street",
+      "city": "Sample City",
+      "state": "Sample State",
+      "country": "Sample Country"
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
