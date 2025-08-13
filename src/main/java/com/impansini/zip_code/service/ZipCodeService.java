@@ -2,7 +2,9 @@ package com.impansini.zip_code.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.impansini.zip_code.domain.ZipCode;
+import com.impansini.zip_code.domain.ZipCodeRequestLog;
 import com.impansini.zip_code.repository.ZipCodeRepository;
+import com.impansini.zip_code.repository.ZipCodeRequestLogRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +22,18 @@ public class ZipCodeService {
     private final ZipCodeRepository zipCodeRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final ZipCodeRequestLogRepository zipCodeRequestLogRepository;
 
-    public ZipCodeService(ZipCodeRepository zipCodeRepository, RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public ZipCodeService(
+            ZipCodeRepository zipCodeRepository,
+            RestTemplate restTemplate,
+            ObjectMapper objectMapper,
+            ZipCodeRequestLogRepository zipCodeRequestLogRepository
+    ) {
         this.zipCodeRepository = zipCodeRepository;
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.zipCodeRequestLogRepository = zipCodeRequestLogRepository;
     }
 
     @Transactional
@@ -49,6 +58,13 @@ public class ZipCodeService {
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             log.info("API WireMock response: {}", response.getBody());
+
+            ZipCodeRequestLog logEntry = new ZipCodeRequestLog();
+            logEntry.setInputZipCode(zipCodeValue);
+            logEntry.setApiResponse(response.getBody());
+            logEntry.setRequestTime(LocalDateTime.now());
+            zipCodeRequestLogRepository.save(logEntry);
+
             return objectMapper.readValue(response.getBody(), ZipCode.class);
         } catch (Exception e) {
             log.error("Error processing API response: {}", e.getMessage());

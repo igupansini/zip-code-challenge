@@ -5,6 +5,7 @@ import com.impansini.zip_code.repository.ZipCodeRequestLogRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ public class ZipCodeRequestLogService {
         return zipCodeRequestLogRepository.findById(id);
     }
 
+    @Transactional
     public List<ZipCodeRequestLog> findAllByInputZipCode(String inputZipCode) {
         log.debug("Request to get a zipCodeRequestLogs by inputZipCode: {}", inputZipCode);
         return zipCodeRequestLogRepository.findAllByInputZipCode(inputZipCode);
