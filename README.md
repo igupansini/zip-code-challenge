@@ -35,8 +35,7 @@ The architecture of this project follows the layered Spring Boot pattern, organi
     - application-dev.properties
 
 **Data Flow**:
-User → REST → Service → Repository → Database
-Database → Repository → Service → REST → User
+User → REST → Service → Repository → Database → Repository → Service → REST → User
 
 ## REST APIs
 The available REST APIs in this project are:
