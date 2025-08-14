@@ -45,10 +45,18 @@ public class ZipCodeService {
         if (zipCode.getCreatedAt() == null) {
             zipCode.setCreatedAt(LocalDateTime.now());
         }
-        zipCode.setStreet(zipCodeFromApi.getStreet());
-        zipCode.setCity(zipCodeFromApi.getCity());
-        zipCode.setState(zipCodeFromApi.getState());
-        zipCode.setCountry(zipCodeFromApi.getCountry());
+        if (zipCode.getStreet() == null) {
+            zipCode.setStreet(zipCodeFromApi.getStreet());
+        }
+        if (zipCode.getCity() == null) {
+            zipCode.setCity(zipCodeFromApi.getCity());
+        }
+        if (zipCode.getState() == null) {
+            zipCode.setState(zipCodeFromApi.getState());
+        }
+        if (zipCode.getCountry() == null) {
+            zipCode.setCountry(zipCodeFromApi.getCountry());
+        }
 
         return zipCodeRepository.save(zipCode);
     }
